@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using LagerApp.DTOs;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,49 @@ namespace LagerApp.Model
         private MySqlConnection GetConnection()
         {
             return new MySqlConnection(ConnectionString);
+        }
+
+        //Speichern des Artikel zur Box: A15000 zu BOX100
+        //Falls A15000 schon vorhanden, dann update von BOX
+        public int saveOrUpdateToBox(LagerBoxDTO dto)
+        {
+            int rowsAffected = 0;
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                if (dto.ArtikelId != null && dto.LagerBox != null)
+                {
+                     MySqlCommand cmd = new MySqlCommand("INSERT INTO artikel (artikel_id,lagerbox_id) " +
+                         "VALUES (@artikel,@box) ON DUPLICATE KEY UPDATE lagerbox_id=@box", conn);
+                     cmd.Parameters.AddWithValue("@artikel", dto.ArtikelId);
+                    cmd.Parameters.AddWithValue("@box", dto.LagerBox);
+                    rowsAffected =cmd.ExecuteNonQuery();
+                }
+                conn.Close();
+
+            }
+            return rowsAffected;
+        }
+
+        //Speichern der Box zum LagerPlatz: BOX100 zu A01-02-01
+        public int saveOrUpdateToPlatz(LagerPlatzDTO dto)
+        {
+            int rowsAffected = 0;
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                if (dto.LagerPlatz != null && dto.LagerBox != null)
+                {
+                    MySqlCommand cmd = new MySqlCommand("UPDATE lagerbox SET lagerplatz_id=@lager " +
+                        "WHERE lagerbox_id=@box", conn);
+                    cmd.Parameters.AddWithValue("@lager", dto.LagerPlatz);
+                    cmd.Parameters.AddWithValue("@box", dto.LagerBox);
+                    rowsAffected = cmd.ExecuteNonQuery();
+                }
+                conn.Close();
+
+            }
+            return rowsAffected;
         }
 
         public List<Artikel> GetAllArtikel()
@@ -55,10 +99,7 @@ namespace LagerApp.Model
                         else
                         {
                             lagerbox_id = reader.GetString("lagerbox_id");
-                        }
-
-
-
+                        }                      
                         list.Add(new Artikel()
                         {
                             ArtikelId = reader.GetString("artikel_id"),                           
