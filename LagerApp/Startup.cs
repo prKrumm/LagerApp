@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using LagerApp.Model;
 
 namespace LagerApp
 {
@@ -29,6 +30,7 @@ namespace LagerApp
         {
             // Add framework services.
             services.AddMvc();
+            services.Add(new ServiceDescriptor(typeof(LagerContext), new LagerContext(Configuration.GetConnectionString("DefaultConnection"))));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
