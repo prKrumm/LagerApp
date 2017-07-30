@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using LagerApp.Model;
 
 namespace LagerApp.Controllers
 {
@@ -10,7 +11,8 @@ namespace LagerApp.Controllers
     {
         public IActionResult Index()
         {
-            return View();
+            LagerContext con=HttpContext.RequestServices.GetService(typeof(LagerApp.Model.LagerContext)) as LagerContext;
+            return View(con.GetAllArtikel());
         }
 
         public IActionResult About()
