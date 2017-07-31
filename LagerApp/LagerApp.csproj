@@ -26,7 +26,6 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Util\" />
     <Folder Include="Views\CSVImportExport\" />
     <Folder Include="wwwroot\uploads\" />
   </ItemGroup>

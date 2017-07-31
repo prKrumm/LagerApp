@@ -9,11 +9,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using LagerApp.Model;
 using Swashbuckle.AspNetCore.Swagger;
+using System.IO;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.FileProviders;
 
 namespace LagerApp
 {
     public class Startup
     {
+        private IHostingEnvironment _hostingEnvironment;
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -22,6 +26,7 @@ namespace LagerApp
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
             Configuration = builder.Build();
+            _hostingEnvironment = env;
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -31,11 +36,14 @@ namespace LagerApp
         {
             // Add framework services.
             services.AddMvc();
+            services.AddDirectoryBrowser();
             services.Add(new ServiceDescriptor(typeof(LagerContext), new LagerContext(Configuration.GetConnectionString("DefaultConnection"))));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
             });
+            var physicalProvider = _hostingEnvironment.ContentRootFileProvider;
+            services.AddSingleton<IFileProvider>(physicalProvider);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,6 +51,7 @@ namespace LagerApp
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+            app.UseStaticFiles();
 
             if (env.IsDevelopment())
             {
@@ -61,8 +70,15 @@ namespace LagerApp
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
+            app.UseDirectoryBrowser(new DirectoryBrowserOptions()
+            {
+                FileProvider = new PhysicalFileProvider(
+           Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot", "uploads")),
+                RequestPath = new PathString("/uploads")
+            });
 
-            app.UseStaticFiles();
+
+
 
             app.UseMvc(routes =>
             {
