@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LagerApp.Model
+namespace LagerApp.DTOs
 {
-    public class Artikel
+    public class ArtikelLagerPlatzDTO
     {
         public string ArtikelId { get; set; }
         public string LagerPlatz { get; set; }
-        public string LagerPlatzOhneBox { get; set; }
-        public string LagerBox { get; set; }
     }
 }

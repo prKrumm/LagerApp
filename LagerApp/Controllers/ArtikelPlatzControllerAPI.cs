@@ -10,13 +10,13 @@ using LagerApp.DTOs;
 
 namespace LagerApp.Controllers
 {
-    [Route("api/platz")]
-    public class LagerPlatzControllerAPI : Controller
+    [Route("api/artikel")]
+    public class ArtikelPlatzControllerAPI : Controller
     {
         // POST api/box
         //Create or Update if exists
         [HttpPost]
-        public IActionResult Post([FromBody]LagerPlatzDTO dto)
+        public IActionResult Post([FromBody]ArtikelLagerPlatzDTO dto)
         {
             LagerContext con = HttpContext.RequestServices.GetService(typeof(LagerApp.Model.LagerContext)) as LagerContext;
             int rowsAffected = 0;
@@ -24,7 +24,7 @@ namespace LagerApp.Controllers
             {
                 return NotFound();
             }
-            rowsAffected = con.saveOrUpdateBoxToPlatz(dto);
+            rowsAffected = con.saveOrUpdateArtikelToPlatz(dto);
 
             return Ok(dto);
         }

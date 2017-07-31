@@ -9,14 +9,18 @@
 <table class="table">
     <tr>
         <th>Artikel ID</th>
-        <th>Lager Box</th>
         <th>Lager Platz</th>
+        <th>Lager Box</th>
+        <th>Box Lager Platz</th>
     </tr>
     @foreach (var item in Model)
     {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.ArtikelId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LagerPlatzOhneBox)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.LagerBox)
