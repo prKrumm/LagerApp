@@ -22,7 +22,7 @@ namespace LagerApp.Controllers
             return View();
         }
 
-        public IActionResult Contact()
+        public IActionResult PickListe()
         {
             ViewData["Message"] = "Your contact page.";
 
