@@ -1,11 +1,12 @@
 ﻿@{
     ViewData["Title"] = "PickListe";
+
 }
 
 
 
 <hr />
-
+@ViewData["SuccessMessage"]
 <div>
     <form enctype="multipart/form-data" method="post" action="http://localhost:54559/api/CSV/new" id="ajaxUploadForm" novalidate="novalidate">
         <fieldset>

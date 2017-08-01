@@ -27,7 +27,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\CSVImportExport\" />
-    <Folder Include="wwwroot\uploads\" />
+    <Folder Include="wwwroot\uploads\GLS\" />
+    <Folder Include="wwwroot\uploads\PickListe\" />
   </ItemGroup>
 
 </Project>

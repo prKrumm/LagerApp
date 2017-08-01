@@ -9,6 +9,7 @@ using System.IO;
 using CsvHelper;
 using LagerApp.Util.csv;
 using Microsoft.Extensions.FileProviders;
+using System.Text;
 
 namespace LagerApp.Controllers
 {
@@ -29,32 +30,45 @@ namespace LagerApp.Controllers
         [HttpPost]
         public async Task<IActionResult> PickListe(IFormFile file)
         {
-            var uploads = Path.Combine(_environment.WebRootPath, "uploads");
+            var uploads = Path.Combine(_environment.WebRootPath, "uploads/GLS");
 
-            if (file.Length > 0)
+            if (file!=null&&file.Length > 0)
             {
-                StreamReader streamReader = new StreamReader(file.OpenReadStream());
+                StreamReader streamReader = new StreamReader(file.OpenReadStream(), Encoding.UTF7);
                 using (var csv = new CsvReader(streamReader))
                 {
-
-
+                    
                     csv.Configuration.RegisterClassMap<GLSMapper>();
                     csv.Configuration.HasHeaderRecord = false;
-
+                    //csv.Configuration.Encoding = Encoding.UTF7;
                     IEnumerable<GLSFile> glsList = csv.GetRecords<GLSFile>().ToList(); ;
+                    glsList = addArtikelNr(glsList);
 
-                    
 
-                    using (var f = new FileStream(Path.Combine(uploads, "GLS.csv"), FileMode.Create))
+                    String fileName = "GLS_" + DateTime.Today.ToString().Substring(0,10).Replace(".", "") + ".csv";
+                    using (var f = new FileStream(Path.Combine(uploads, fileName), FileMode.Create))
                     {
                     
 
-                        StreamWriter writer = new StreamWriter(f);
+                        StreamWriter writer = new StreamWriter(f, Encoding.UTF8);
                         CsvWriter glsoutput = new CsvWriter(writer);
-                        glsoutput.Configuration.RegisterClassMap<GLSMapper>();
+                        glsoutput.Configuration.RegisterClassMap<GLSMapperWrite>();
                         glsoutput.Configuration.HasHeaderRecord = false;
 
                         glsoutput.WriteRecords(glsList);
+                        if (csv.Context.Row == glsoutput.Context.Row)
+                        {
+                            ViewData["SuccessMessage"] = "Erfolgreich " + (glsoutput.Context.Row - 1) + " Adressen verarbeitet";
+                            glsoutput.Dispose();
+                            return View();
+                        }
+                        else
+                        {
+                            ViewData["SuccessMessage"] = "Etwas hat nicht geklappt! " + (glsoutput.Context.Row - 1) + " Adressen verarbeitet";
+                            glsoutput.Dispose();
+                            return View(glsoutput.Context.Row);
+                        }
+                        
 
                     }
                 }
@@ -66,6 +80,18 @@ namespace LagerApp.Controllers
 
 
             return View();
+        }
+
+        private IEnumerable<GLSFile> addArtikelNr(IEnumerable<GLSFile> glsFile)
+        {
+            foreach (var item in glsFile)
+            {
+                String artikelName = item.ArtikelName;
+
+                //filter A15000
+                item.ArtikelNr = artikelName;
+            }
+            return glsFile;
         }
 
 

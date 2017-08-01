@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace LagerApp.Util.csv
 {
-    public class GLSMapper : CsvClassMap<GLSFile>
+    public class GLSMapperWrite : CsvClassMap<GLSFile>
     {
-        public GLSMapper()
+        public GLSMapperWrite()
         {
             Map(m => m.DrAuftragsnr).Index(0);
             Map(m => m.KundenName).Index(1);
@@ -28,7 +28,7 @@ namespace LagerApp.Util.csv
             Map(m => m.SonderFeld8).Index(15);
             Map(m => m.Mail).Index(16);
             Map(m => m.SonderFeld9).Index(17);
-            Map(m => m.ArtikelNr).Ignore();
+            Map(m => m.ArtikelNr).Index(18);
         }
     }
 }

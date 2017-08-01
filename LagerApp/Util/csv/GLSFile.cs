@@ -8,7 +8,7 @@ namespace LagerApp.Util.csv
     public class GLSFile
     {
         public string DrAuftragsnr { get; set; }
-        //public string ArtikelNr { get; set; }
+        public string ArtikelNr { get; set; }
         public string ArtikelName { get; set; }
 
 
