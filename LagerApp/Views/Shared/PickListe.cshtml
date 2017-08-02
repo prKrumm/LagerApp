@@ -53,18 +53,20 @@ else
             <input type="button" value="Neuen Artikel hinzufügen" id="target" class="btn">
         </div>
         <div class="col-lg-6">
-            <input type="text" name="artikelNr" id="artikelnr"/>
+            <input type="text" name="artikelNr" id="artikelnr" pattern="[a-cA-CsS][0-9]{5,5}"/>
         </div>
 </form>
 
 </div>
 <br />
 <br />
+<br />
+<br />
 
 <div id="pickliste">
     <h2>PickListe
     <script> document.write(new Date().toLocaleDateString()); </script></h2>
-    <table class="table table-responsive">
+    <table id="pickTabelle" class="table table-responsive">
         <tr>
             <th>AuftragNr</th>
             <th>Artikel ID</th>

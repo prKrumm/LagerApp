@@ -30,11 +30,13 @@ namespace LagerApp.Controllers
 
 
         [HttpGet("/lager/{id}", Name = "Lager_List")]
-        public Task<IActionResult> Lager(String id)
+        public IActionResult Lager(String id)
         {
-            string artikelNr = id;
-               
-
+            string artikelNr = id.Trim();
+            LagerContext con = HttpContext.RequestServices.GetService(typeof(LagerApp.Model.LagerContext)) as LagerContext;
+            
+            Artikel artikel=con.GetLagerPlatzByArtikel(artikelNr);
+            return Json(artikel);
         }
 
         [Route("new")]
