@@ -1,25 +1,24 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "PickListe";
 
 }
 
+<style>
+    
+</style>
 
+@model IEnumerable<LagerApp.Model.Artikel>
 
 <hr />
-@ViewData["SuccessMessage"]
+<div class="alert alert-info">
+    <strong>@ViewData["SuccessMessage"]</strong> 
+</div>
+
 <div>
     <form enctype="multipart/form-data" method="post" action="http://localhost:54559/api/CSV/new" id="ajaxUploadForm" novalidate="novalidate">
         <fieldset>
             <legend style="padding-top: 10px; padding-bottom: 10px;">Upload existing CSV data</legend>
-
-            <div class="col-xs-12" style="padding: 10px;">
-                <div class="col-xs-4">
-                    <label>Upload Information</label>
-                </div>
-                <div class="col-xs-7">
-                    <textarea rows="2" placeholder="Information" class="form-control" name="information" id="information"></textarea>
-                </div>
-            </div>
 
             <div class="col-xs-12" style="padding: 10px;">
                 <div class="col-xs-4">
@@ -42,3 +41,57 @@
         </fieldset>
     </form>
 </div>
+
+<h2>Artikel</h2>
+<table class="table table-responsive">
+    <tr>
+        <th>Artikel ID</th>
+        <th style="word-break:break-all;word-wrap:break-word;width:800px;">Artikel Bezeichnung</th>
+        <th>Lager Box</th>
+        <th>Lager Platz</th>
+    </tr>
+    @if (Model != null)
+    {
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ArtikelId)
+            </td>
+            <td style="word-break:break-all;word-wrap:break-word;width:800px;">
+                @Html.DisplayFor(modelItem => item.ArtikelBezeichnung)
+            </td>         
+            <td>
+                @Html.DisplayFor(modelItem => item.LagerBox)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LagerPlatz)
+            </td>
+
+        </tr>
+    }
+    }
+    else
+    {
+        <tr>
+            <td>
+                leer
+            </td>
+            <td>
+                <div  style="word-break:break-all;word-wrap:break-word; width:800px;">leeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer</div>
+            </td>
+            <td>
+                leer
+            </td>
+            <td>
+                leer
+            </td>
+
+        </tr>
+
+    }
+</table>
+
+
+
+

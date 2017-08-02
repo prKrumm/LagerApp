@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Home Page";
 }
+
+
 <h1>Meine PickListen</h1>
 <a href="~/uploads/">Meine PickListen</a>
 
@@ -14,6 +16,8 @@
         <th>Lager Box</th>
         <th>Box Lager Platz</th>
     </tr>
+@if (Model != null)
+{
     @foreach (var item in Model)
     {
         <tr>
@@ -32,4 +36,24 @@
             
         </tr>
     }
+}
+else
+{
+    <tr>
+        <td>
+            leer
+        </td>
+        <td>
+            leer
+        </td>
+        <td>
+            leer
+        </td>
+        <td>
+            leer
+        </td>
+
+    </tr>
+
+}
 </table>

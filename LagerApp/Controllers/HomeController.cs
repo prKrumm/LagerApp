@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using LagerApp.Model;
+using System.Net.Http;
+using Microsoft.AspNetCore.NodeServices;
 
 namespace LagerApp.Controllers
 {
@@ -15,9 +17,19 @@ namespace LagerApp.Controllers
             return View(con.GetAllArtikel());
         }
 
-        public IActionResult About()
+        [HttpGet]
+        public async Task<IActionResult> About([FromServices] INodeServices nodeServices)
         {
-            ViewData["Message"] = "Your application description page.";
+            HttpClient hc = new HttpClient();
+            var htmlContent = await hc.GetStringAsync($"http://{Request.Host}/uploads/report.html");
+
+            var result = await nodeServices.InvokeAsync<byte[]>("./pdf", htmlContent);
+
+            HttpContext.Response.ContentType = "application/pdf";
+
+            HttpContext.Response.Headers.Add("x-filename", "report.pdf");
+            HttpContext.Response.Headers.Add("Access-Control-Expose-Headers", "x-filename");
+            HttpContext.Response.Body.Write(result, 0, result.Length);
 
             return View();
         }
@@ -28,6 +40,7 @@ namespace LagerApp.Controllers
 
             return View();
         }
+
 
         public IActionResult Error()
         {

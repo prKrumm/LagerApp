@@ -11,5 +11,6 @@ namespace LagerApp.Model
         public string LagerPlatz { get; set; }
         public string LagerPlatzOhneBox { get; set; }
         public string LagerBox { get; set; }
+        public string ArtikelBezeichnung { get; set; }
     }
 }

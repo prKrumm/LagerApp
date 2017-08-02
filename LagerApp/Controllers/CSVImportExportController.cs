@@ -10,6 +10,9 @@ using CsvHelper;
 using LagerApp.Util.csv;
 using Microsoft.Extensions.FileProviders;
 using System.Text;
+using LagerApp.Model;
+using LagerApp.Util;
+using System.Text.RegularExpressions;
 
 namespace LagerApp.Controllers
 {
@@ -31,19 +34,18 @@ namespace LagerApp.Controllers
         public async Task<IActionResult> PickListe(IFormFile file)
         {
             var uploads = Path.Combine(_environment.WebRootPath, "uploads/GLS");
-
+            List<Artikel> list = new List<Artikel>();
             if (file!=null&&file.Length > 0)
             {
                 StreamReader streamReader = new StreamReader(file.OpenReadStream(), Encoding.UTF7);
                 using (var csv = new CsvReader(streamReader))
-                {
-                    
+                {                    
                     csv.Configuration.RegisterClassMap<GLSMapper>();
                     csv.Configuration.HasHeaderRecord = false;
                     //csv.Configuration.Encoding = Encoding.UTF7;
                     IEnumerable<GLSFile> glsList = csv.GetRecords<GLSFile>().ToList(); ;
                     glsList = addArtikelNr(glsList);
-
+                    list = printPickliste(glsList);
 
                     String fileName = "GLS_" + DateTime.Today.ToString().Substring(0,10).Replace(".", "") + ".csv";
                     using (var f = new FileStream(Path.Combine(uploads, fileName), FileMode.Create))
@@ -60,13 +62,13 @@ namespace LagerApp.Controllers
                         {
                             ViewData["SuccessMessage"] = "Erfolgreich " + (glsoutput.Context.Row - 1) + " Adressen verarbeitet";
                             glsoutput.Dispose();
-                            return View();
+                            return View(list);
                         }
                         else
                         {
                             ViewData["SuccessMessage"] = "Etwas hat nicht geklappt! " + (glsoutput.Context.Row - 1) + " Adressen verarbeitet";
                             glsoutput.Dispose();
-                            return View(glsoutput.Context.Row);
+                            return View(list);
                         }
                         
 
@@ -82,16 +84,48 @@ namespace LagerApp.Controllers
             return View();
         }
 
+        private List<Artikel> printPickliste(IEnumerable<GLSFile> glsFile)
+        {
+            List<Artikel> list = new List<Artikel>();
+            LagerContext con = HttpContext.RequestServices.GetService(typeof(LagerApp.Model.LagerContext)) as LagerContext;
+            foreach (var item in glsFile)
+            {
+                Artikel artikel = con.GetLagerPlatzByArtikel(item.ArtikelNr);
+                artikel.ArtikelId = item.ArtikelNr;
+                artikel.ArtikelBezeichnung = item.ArtikelName;
+                list.Add(artikel);
+            }
+            return list;
+        }
+
         private IEnumerable<GLSFile> addArtikelNr(IEnumerable<GLSFile> glsFile)
         {
             foreach (var item in glsFile)
             {
                 String artikelName = item.ArtikelName;
-
-                //filter A15000
-                item.ArtikelNr = artikelName;
+                
+                item.ArtikelNr = extractArtikelNr(artikelName);
             }
             return glsFile;
+        }
+
+        private String extractArtikelNr(String ArtikelBezeichnung)
+        {
+            //filter A15000
+            Regex regex=new Regex(Config.Nummern);
+            Match match = regex.Match(ArtikelBezeichnung);
+
+            if (match.Success)
+            {
+                Console.WriteLine("Found Match for {0}", match.Value);
+                String ArtikelNr = match.Value;
+                return ArtikelNr;
+            }
+            else
+            {
+                return null;
+            }
+
         }
 
 

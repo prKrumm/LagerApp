@@ -58,7 +58,7 @@ namespace LagerApp.Model
                     cmd.Parameters.AddWithValue("@artikel", dto.ArtikelId);
                     cmd.Parameters.AddWithValue("@platz", dto.LagerPlatz);
                     cmd.Parameters.AddWithValue("@box", null);
-                   rowsAffected = cmd.ExecuteNonQuery();
+                    rowsAffected = cmd.ExecuteNonQuery();
                 }
                 conn.Close();
 
@@ -87,10 +87,9 @@ namespace LagerApp.Model
             return rowsAffected;
         }
 
-        public List<Artikel> GetAllArtikel()
+        public Artikel GetLagerPlatzByArtikel(String ArtikelNr)
         {
-            List<Artikel> list = new List<Artikel>();
-
+            Artikel artikel = new Artikel();
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
@@ -98,8 +97,8 @@ namespace LagerApp.Model
                 //    "where a.lagerbox_id = b.lagerbox_id AND b.lagerplatz_id = p.lagerplatz_id", conn);
 
                 MySqlCommand cmd = new MySqlCommand("SELECT * FROM (artikel a LEFT JOIN lagerbox b " +
-                    "ON a.lagerbox_id = b.lagerbox_id) LEFT OUTER JOIN lagerplatz p ON b.lagerplatz_box_id = p.lagerplatz_id", conn);
-
+                    "ON a.lagerbox_id = b.lagerbox_id) LEFT OUTER JOIN lagerplatz p ON b.lagerplatz_box_id = p.lagerplatz_id where artikel_id=@artikelid", conn);
+                cmd.Parameters.AddWithValue("@artikelid", ArtikelNr);
                 String lagerplatz_id_ohne_box;
                 String lagerplatz_id;
                 String lagerbox_id;
@@ -132,20 +131,85 @@ namespace LagerApp.Model
                         else
                         {
                             lagerbox_id = reader.GetString("lagerbox_id");
-                        }                      
-                        list.Add(new Artikel()
+                        }
+
+                        artikel.ArtikelId = reader.GetString("artikel_id");
+                        artikel.LagerPlatz = lagerplatz_id;
+                        if (String.IsNullOrEmpty(lagerplatz_id))
                         {
-                            ArtikelId = reader.GetString("artikel_id"),                           
-                            LagerPlatz = lagerplatz_id,
-                            LagerPlatzOhneBox = lagerplatz_id_ohne_box,
-                            LagerBox = lagerbox_id
-                        });
+                            artikel.LagerPlatz = lagerplatz_id_ohne_box;
+                        }
+                        artikel.LagerPlatzOhneBox = lagerplatz_id_ohne_box;
+                        artikel.LagerBox = lagerbox_id;
+
+
+
                     }
                 }
-            }
+                return artikel;
 
-            return list;
+            }
         }
 
+            public List<Artikel> GetAllArtikel()
+            {
+                List<Artikel> list = new List<Artikel>();
+
+                using (MySqlConnection conn = GetConnection())
+                {
+                    conn.Open();
+                    //MySqlCommand cmd = new MySqlCommand("SELECT * FROM artikel a,lagerbox b,lagerplatz p " +
+                    //    "where a.lagerbox_id = b.lagerbox_id AND b.lagerplatz_id = p.lagerplatz_id", conn);
+
+                    MySqlCommand cmd = new MySqlCommand("SELECT * FROM (artikel a LEFT JOIN lagerbox b " +
+                        "ON a.lagerbox_id = b.lagerbox_id) LEFT OUTER JOIN lagerplatz p ON b.lagerplatz_box_id = p.lagerplatz_id", conn);
+
+                    String lagerplatz_id_ohne_box;
+                    String lagerplatz_id;
+                    String lagerbox_id;
+
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {   //LagerPlatz ohne Box
+                            if (reader.IsDBNull(2))
+                            {
+                                lagerplatz_id_ohne_box = "";
+                            }
+                            else
+                            {
+                                lagerplatz_id_ohne_box = reader.GetString("lagerplatz_id");
+                            }
+                            //LagerPlatz mit Box
+                            if (reader.IsDBNull(4))
+                            {
+                                lagerplatz_id = "";
+                            }
+                            else
+                            {
+                                lagerplatz_id = reader.GetString("lagerplatz_box_id");
+                            }
+                            if (reader.IsDBNull(1))
+                            {
+                                lagerbox_id = "";
+                            }
+                            else
+                            {
+                                lagerbox_id = reader.GetString("lagerbox_id");
+                            }
+                            list.Add(new Artikel()
+                            {
+                                ArtikelId = reader.GetString("artikel_id"),
+                                LagerPlatz = lagerplatz_id,
+                                LagerPlatzOhneBox = lagerplatz_id_ohne_box,
+                                LagerBox = lagerbox_id
+                            });
+                        }
+                    }
+                }
+
+                return list;
+            }
+
+        }
     }
-}

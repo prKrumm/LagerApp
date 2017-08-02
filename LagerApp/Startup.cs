@@ -44,6 +44,7 @@ namespace LagerApp
             });
             var physicalProvider = _hostingEnvironment.ContentRootFileProvider;
             services.AddSingleton<IFileProvider>(physicalProvider);
+            services.AddNodeServices();// this is in package Microsoft.AspNetCore.NodeServices 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
