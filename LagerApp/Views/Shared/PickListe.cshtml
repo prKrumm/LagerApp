@@ -1,22 +1,27 @@
 ﻿
 @{
     ViewData["Title"] = "PickListe";
-
 }
 
 <style>
-    
+
 </style>
 
 @model IEnumerable<LagerApp.Model.Artikel>
 
-<hr />
-<div class="alert alert-info">
-    <strong>@ViewData["SuccessMessage"]</strong> 
-</div>
+<br />
+@if (ViewData["SuccessMessage"] == null)
+{
+}
+else
+{
+    <div class="alert alert-info">
+        <strong>@ViewData["SuccessMessage"]</strong>
+    </div>
+}
 
 <div>
-    <form enctype="multipart/form-data" method="post" action="http://localhost:54559/api/CSV/new" id="ajaxUploadForm" novalidate="novalidate">
+    <form enctype="multipart/form-data" method="post" action="http://localhost:54559/new" id="ajaxUploadForm" novalidate="novalidate">
         <fieldset>
             <legend style="padding-top: 10px; padding-bottom: 10px;">Upload existing CSV data</legend>
 
@@ -41,56 +46,81 @@
         </fieldset>
     </form>
 </div>
+<hr />
+<div class="col-xs-12" style="padding: 10px;">
+<form>
+        <div class="col-lg-4">
+            <input type="button" value="Neuen Artikel hinzufügen" id="target" class="btn">
+        </div>
+        <div class="col-lg-6">
+            <input type="text" name="artikelNr" id="artikelnr"/>
+        </div>
+</form>
 
-<h2>Artikel</h2>
-<table class="table table-responsive">
-    <tr>
-        <th>Artikel ID</th>
-        <th style="word-break:break-all;word-wrap:break-word;width:800px;">Artikel Bezeichnung</th>
-        <th>Lager Box</th>
-        <th>Lager Platz</th>
-    </tr>
-    @if (Model != null)
-    {
-    @foreach (var item in Model)
-    {
+</div>
+<br />
+<br />
+
+<div id="pickliste">
+    <h2>PickListe
+    <script> document.write(new Date().toLocaleDateString()); </script></h2>
+    <table class="table table-responsive">
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ArtikelId)
-            </td>
-            <td style="word-break:break-all;word-wrap:break-word;width:800px;">
-                @Html.DisplayFor(modelItem => item.ArtikelBezeichnung)
-            </td>         
-            <td>
-                @Html.DisplayFor(modelItem => item.LagerBox)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LagerPlatz)
-            </td>
-
+            <th>AuftragNr</th>
+            <th>Artikel ID</th>
+            <th style="word-break:break-all;word-wrap:break-word;width:700px;">Artikel Bezeichnung</th>
+            <th>Lager Box</th>
+            <th>Lager Platz</th>
         </tr>
-    }
-    }
-    else
-    {
-        <tr>
-            <td>
-                leer
-            </td>
-            <td>
-                <div  style="word-break:break-all;word-wrap:break-word; width:800px;">leeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeer</div>
-            </td>
-            <td>
-                leer
-            </td>
-            <td>
-                leer
-            </td>
+        @if (Model != null)
+        {
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DRAuftragsnr)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ArtikelId)
+                    </td>
+                    <td style="word-break:break-all;word-wrap:break-word;width:800px;">
+                        @Html.DisplayFor(modelItem => item.ArtikelBezeichnung)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LagerBox)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.LagerPlatz)
+                    </td>
 
-        </tr>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td>
+                    leer
+                </td>
+                <td>
+                    leer
+                </td>
+                <td>
+                    <div style="word-break:break-all;word-wrap:break-word; width:800px;">leer</div>
+                </td>
+                <td>
+                    leer
+                </td>
+                <td>
+                    leer
+                </td>
 
-    }
-</table>
+            </tr>
+
+        }
+    </table>
+</div>
+
 
 
 

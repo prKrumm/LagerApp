@@ -17,7 +17,6 @@ using System.Text.RegularExpressions;
 namespace LagerApp.Controllers
 {
 
-    [Route("api/CSV")]
     public class CSVImportExportController : Controller
     {
         private readonly IHostingEnvironment _environment;
@@ -27,6 +26,15 @@ namespace LagerApp.Controllers
         {
             _environment = hostingEnvironment;
             _fileProvider = fileProvider;
+        }
+
+
+        [HttpGet("/lager/{id}", Name = "Lager_List")]
+        public Task<IActionResult> Lager(String id)
+        {
+            string artikelNr = id;
+               
+
         }
 
         [Route("new")]
@@ -60,13 +68,14 @@ namespace LagerApp.Controllers
                         glsoutput.WriteRecords(glsList);
                         if (csv.Context.Row == glsoutput.Context.Row)
                         {
-                            ViewData["SuccessMessage"] = "Erfolgreich " + (glsoutput.Context.Row - 1) + " Adressen verarbeitet";
+                            ViewData["SuccessMessage"] = "Erfolgreich " + (glsoutput.Context.Row - 1) + " Bestellungen verarbeitet";
                             glsoutput.Dispose();
-                            return View(list);
+                            List<Artikel> SortedList = list.OrderByDescending(o => o.foundArticleNr).ThenBy(o => o.LagerPlatz).ToList();
+                            return View(SortedList);
                         }
                         else
                         {
-                            ViewData["SuccessMessage"] = "Etwas hat nicht geklappt! " + (glsoutput.Context.Row - 1) + " Adressen verarbeitet";
+                            ViewData["SuccessMessage"] = "Etwas hat nicht geklappt!!!!!!!!!!!! " + (glsoutput.Context.Row - 1) + " Adressen verarbeitet";
                             glsoutput.Dispose();
                             return View(list);
                         }
@@ -84,16 +93,52 @@ namespace LagerApp.Controllers
             return View();
         }
 
+
+
         private List<Artikel> printPickliste(IEnumerable<GLSFile> glsFile)
         {
             List<Artikel> list = new List<Artikel>();
             LagerContext con = HttpContext.RequestServices.GetService(typeof(LagerApp.Model.LagerContext)) as LagerContext;
             foreach (var item in glsFile)
             {
-                Artikel artikel = con.GetLagerPlatzByArtikel(item.ArtikelNr);
-                artikel.ArtikelId = item.ArtikelNr;
-                artikel.ArtikelBezeichnung = item.ArtikelName;
-                list.Add(artikel);
+                //Mehrere Artikel pro Bestellung
+                if (item.ArtikelNr!=null&&item.ArtikelNr.Contains(","))
+                {
+                    String[] artikelNrn = item.ArtikelNr.Split(',');
+                    String[] artikelBzn = item.ArtikelName.Split('/');
+                    for (int i = 0; i < artikelBzn.Length - 1; i++)
+                    {
+                        if (i < artikelBzn.Length - 1 && i < artikelNrn.Length)
+                        {
+                            Artikel artikel = con.GetLagerPlatzByArtikel(artikelNrn[i]);
+                            if (!String.IsNullOrEmpty(artikel.LagerPlatz))
+                            {
+                                artikel.foundArticleNr = true;
+                            }
+                            
+                            artikel.DRAuftragsnr = item.DrAuftragsnr;
+                            artikel.ArtikelId = artikelNrn[i];
+                            artikel.ArtikelBezeichnung = artikelBzn[i];
+                            list.Add(artikel);
+                        }
+                    }
+                }
+                else
+                {
+
+                    Artikel artikel = con.GetLagerPlatzByArtikel(item.ArtikelNr);
+                    if (!String.IsNullOrEmpty(artikel.LagerPlatz))
+                    {
+                        artikel.foundArticleNr = true;
+                    }
+                    artikel.DRAuftragsnr = item.DrAuftragsnr;
+                    artikel.ArtikelId = item.ArtikelNr;
+                    artikel.ArtikelBezeichnung = item.ArtikelName;
+                    list.Add(artikel);
+
+                }
+                
+               
             }
             return list;
         }
@@ -112,13 +157,23 @@ namespace LagerApp.Controllers
         private String extractArtikelNr(String ArtikelBezeichnung)
         {
             //filter A15000
-            Regex regex=new Regex(Config.Nummern);
-            Match match = regex.Match(ArtikelBezeichnung);
-
-            if (match.Success)
+            Regex regex = new Regex(Config.Nummern);
+            MatchCollection matches = regex.Matches(ArtikelBezeichnung);
+            if (matches.Count > 0) { 
+            String ArtikelNr = "";
+                var zähler = 0;
+            foreach (var item in matches)
             {
-                Console.WriteLine("Found Match for {0}", match.Value);
-                String ArtikelNr = match.Value;
+                    if (zähler == 0)
+                    {
+                        ArtikelNr = item.ToString();
+                    }
+                    else
+                    {
+                        ArtikelNr = ArtikelNr+","+item.ToString();       
+                    }
+                    zähler++;
+            }
                 return ArtikelNr;
             }
             else
