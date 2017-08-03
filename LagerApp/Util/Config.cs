@@ -12,6 +12,7 @@ namespace LagerApp.Util
         public const String ebayNummern = "[a-cA-C][0-9]{5,5}"; //A15000
         public const String shopNummern = "[sS][0-9]{5,5}";	//S15000	
         public const String lagerPlätze = "[kKsSiIaA]\\d\\d-\\d-\\d";
-        
+        public const String Boxen = "BOX\\d{3,4}"; //BOX1000
+
     }
 }

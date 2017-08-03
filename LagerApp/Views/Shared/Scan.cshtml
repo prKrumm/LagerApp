@@ -1,0 +1,113 @@
+
+@{
+    ViewData["Title"] = "Scan";
+}
+
+<h2>Scan</h2>
+
+
+@model LagerApp.Util.xlsx.LoggerXLSX
+
+<div>
+    <form enctype="multipart/form-data" method="post" action="http://localhost:54559/scan" id="ajaxUploadForm" novalidate="novalidate">
+        <fieldset>
+            <legend style="padding-top: 10px; padding-bottom: 10px;">Upload existing  XLSX data</legend>
+
+            <div class="col-xs-12" style="padding: 10px;">
+                <div class="col-xs-4">
+                    <label>Upload XLSX data</label>
+                </div>
+                <div class="col-xs-7">
+                    <input type="file" name="file" id="fileInput">
+                </div>
+            </div>
+           
+
+            <div class="col-xs-12" style="padding: 10px;">
+                <div class="col-xs-4">
+                    <input type="submit" value="Upload Updated Data" id="ajaxUploadButton" class="btn">
+                </div>
+                <div class="col-xs-7">
+
+                </div>
+            </div>
+
+
+        </fieldset>
+    </form>
+</div>
+<h2>Erfolgreich gespeichert</h2>
+<table class="table table-responsive">
+    <tr>
+        <th>druck_pseudonym</th>
+        <th>lager_platz</th>        
+    </tr>
+    @if (Model != null)
+    {
+       
+        @foreach (var item in Model.success)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.druck_pseudonym)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.lager_fach)
+                </td>
+               
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td>
+                leer
+            </td>
+            <td>
+                leer
+            </td>
+           
+        </tr>
+
+    }
+    </table>
+<h2>Fehlerhafte Eintraege</h2>
+<table class="table table-responsive">
+    <tr>
+        <th>druck_pseudonym</th>
+        <th>lager_platz</th>
+    </tr>
+    @if (Model != null)
+    {
+
+        @foreach (var item in Model.fail)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.druck_pseudonym)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.lager_fach)
+                </td>
+
+            </tr>
+        }
+    }
+    else
+    {
+        <tr>
+            <td>
+                leer
+            </td>
+            <td>
+                leer
+            </td>
+
+        </tr>
+
+    }
+</table>
+
+
+

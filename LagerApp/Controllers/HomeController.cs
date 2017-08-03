@@ -34,6 +34,13 @@ namespace LagerApp.Controllers
             return View();
         }
 
+        public IActionResult Scan()
+        {
+            ViewData["Message"] = "Your contact page.";
+
+            return View();
+        }
+
         public IActionResult PickListe()
         {
             ViewData["Message"] = "Your contact page.";

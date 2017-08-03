@@ -12,6 +12,7 @@ using Swashbuckle.AspNetCore.Swagger;
 using System.IO;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace LagerApp
 {
@@ -41,10 +42,17 @@ namespace LagerApp
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+
+                 var basePath= PlatformServices.Default.Application.ApplicationBasePath;
+                 var xmlPath = Path.Combine(basePath, "api.xml");
+                 c.IncludeXmlComments(xmlPath);
+
             });
             var physicalProvider = _hostingEnvironment.ContentRootFileProvider;
             services.AddSingleton<IFileProvider>(physicalProvider);
             services.AddNodeServices();// this is in package Microsoft.AspNetCore.NodeServices 
+            
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

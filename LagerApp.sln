@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LagerApp", "LagerApp\LagerApp.csproj", "{386E56BC-3639-46A3-8362-AD0BA6165859}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LagerApp", "LagerApp\LagerApp.csproj", "{386E56BC-3639-46A3-8362-AD0BA6165859}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LagerAppTest", "LagerAppTest\LagerAppTest.csproj", "{8C8B5BFA-F983-4062-A56E-F05727546320}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{386E56BC-3639-46A3-8362-AD0BA6165859}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{386E56BC-3639-46A3-8362-AD0BA6165859}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{386E56BC-3639-46A3-8362-AD0BA6165859}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C8B5BFA-F983-4062-A56E-F05727546320}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C8B5BFA-F983-4062-A56E-F05727546320}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C8B5BFA-F983-4062-A56E-F05727546320}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C8B5BFA-F983-4062-A56E-F05727546320}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

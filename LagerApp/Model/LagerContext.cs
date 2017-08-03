@@ -31,6 +31,13 @@ namespace LagerApp.Model
                 conn.Open();
                 if (dto.ArtikelId != null && dto.LagerBox != null)
                 {
+                    Boolean foundBox = checkBoxExists(dto.LagerBox, conn);
+                    if (!foundBox)
+                    {
+                        LagerPlatzDTO platzdto = new LagerPlatzDTO();
+                        platzdto.LagerBox = dto.LagerBox;
+                        insertLagerBox(platzdto, conn);
+                    }
                     MySqlCommand cmd = new MySqlCommand("INSERT INTO artikel (artikel_id,lagerbox_id,lagerplatz_id) " +
                         "VALUES (@artikel,@box,@platz) ON DUPLICATE KEY UPDATE lagerbox_id=@box", conn);
                     cmd.Parameters.AddWithValue("@artikel", dto.ArtikelId);
@@ -53,6 +60,12 @@ namespace LagerApp.Model
                 conn.Open();
                 if (dto.LagerPlatz != null && dto.LagerPlatz != null)
                 {
+                    Boolean foundPlatz = checkLagerPlatzExists(dto.LagerPlatz,conn);
+                    if (!foundPlatz)
+                    {
+                        insertLagerplatz(dto.LagerPlatz, conn);
+                    }
+
                     MySqlCommand cmd = new MySqlCommand("INSERT INTO artikel (artikel_id,lagerbox_id,lagerplatz_id) " +
                          "VALUES (@artikel,@box,@platz) ON DUPLICATE KEY UPDATE lagerplatz_id=@platz", conn);
                     cmd.Parameters.AddWithValue("@artikel", dto.ArtikelId);
@@ -73,18 +86,60 @@ namespace LagerApp.Model
             using (MySqlConnection conn = GetConnection())
             {
                 conn.Open();
+
                 if (dto.LagerPlatz != null && dto.LagerBox != null)
                 {
-                    MySqlCommand cmd = new MySqlCommand("UPDATE lagerbox SET lagerplatz_box_id=@lager " +
-                        "WHERE lagerbox_id=@box", conn);
-                    cmd.Parameters.AddWithValue("@lager", dto.LagerPlatz);
-                    cmd.Parameters.AddWithValue("@box", dto.LagerBox);
-                    rowsAffected = cmd.ExecuteNonQuery();
+                    Boolean boxexists = checkBoxExists(dto.LagerBox, conn);
+                    Boolean platzexists = checkLagerPlatzExists(dto.LagerPlatz, conn);
+                    if (!platzexists)
+                    {
+                        insertLagerplatz(dto.LagerPlatz, conn);
+                    }
+                    if (!boxexists)
+                    {
+                        insertLagerBox(dto, conn);
+                    }
+                    else
+                    {
+                        MySqlCommand cmd = new MySqlCommand("UPDATE lagerbox SET lagerplatz_box_id=@lager " +
+                            "WHERE lagerbox_id=@box", conn);
+                        cmd.Parameters.AddWithValue("@lager", dto.LagerPlatz);
+                        cmd.Parameters.AddWithValue("@box", dto.LagerBox);
+                        rowsAffected = cmd.ExecuteNonQuery();
+                    }
+
+
                 }
                 conn.Close();
 
             }
             return rowsAffected;
+        }
+
+        //Lagerplatz speichern
+        public int insertLagerplatz(String lagerplatz_id, MySqlConnection conn)
+        {
+            var rowsAffected = 0;
+            //Erst Box anlegen
+            MySqlCommand cmd = new MySqlCommand("INSERT INTO lagerplatz (lagerplatz_id) " +
+                "VALUES (@lager)", conn);
+            cmd.Parameters.AddWithValue("@lager", lagerplatz_id);
+            rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected;
+
+        }
+        //Lagerplatz speichern
+        public int insertLagerBox(LagerPlatzDTO dto, MySqlConnection conn)
+        {
+            var rowsAffected = 0;
+            //Erst Box anlegen
+            MySqlCommand cmd = new MySqlCommand("INSERT INTO lagerbox (lagerbox_id,lagerplatz_box_id) " +
+                "VALUES (@box,@lager)", conn);
+            cmd.Parameters.AddWithValue("@lager", dto.LagerPlatz);
+            cmd.Parameters.AddWithValue("@box", dto.LagerBox);
+            rowsAffected = cmd.ExecuteNonQuery();
+            return rowsAffected;
+
         }
 
         public Artikel GetLagerPlatzByArtikel(String ArtikelNr)
@@ -151,65 +206,94 @@ namespace LagerApp.Model
             }
         }
 
-            public List<Artikel> GetAllArtikel()
+        public List<Artikel> GetAllArtikel()
+        {
+            List<Artikel> list = new List<Artikel>();
+
+            using (MySqlConnection conn = GetConnection())
             {
-                List<Artikel> list = new List<Artikel>();
+                conn.Open();
+                //MySqlCommand cmd = new MySqlCommand("SELECT * FROM artikel a,lagerbox b,lagerplatz p " +
+                //    "where a.lagerbox_id = b.lagerbox_id AND b.lagerplatz_id = p.lagerplatz_id", conn);
 
-                using (MySqlConnection conn = GetConnection())
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM (artikel a LEFT JOIN lagerbox b " +
+                    "ON a.lagerbox_id = b.lagerbox_id) LEFT OUTER JOIN lagerplatz p ON b.lagerplatz_box_id = p.lagerplatz_id", conn);
+
+                String lagerplatz_id_ohne_box;
+                String lagerplatz_id;
+                String lagerbox_id;
+
+                using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
-                    conn.Open();
-                    //MySqlCommand cmd = new MySqlCommand("SELECT * FROM artikel a,lagerbox b,lagerplatz p " +
-                    //    "where a.lagerbox_id = b.lagerbox_id AND b.lagerplatz_id = p.lagerplatz_id", conn);
-
-                    MySqlCommand cmd = new MySqlCommand("SELECT * FROM (artikel a LEFT JOIN lagerbox b " +
-                        "ON a.lagerbox_id = b.lagerbox_id) LEFT OUTER JOIN lagerplatz p ON b.lagerplatz_box_id = p.lagerplatz_id", conn);
-
-                    String lagerplatz_id_ohne_box;
-                    String lagerplatz_id;
-                    String lagerbox_id;
-
-                    using (MySqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {   //LagerPlatz ohne Box
-                            if (reader.IsDBNull(2))
-                            {
-                                lagerplatz_id_ohne_box = "";
-                            }
-                            else
-                            {
-                                lagerplatz_id_ohne_box = reader.GetString("lagerplatz_id");
-                            }
-                            //LagerPlatz mit Box
-                            if (reader.IsDBNull(4))
-                            {
-                                lagerplatz_id = "";
-                            }
-                            else
-                            {
-                                lagerplatz_id = reader.GetString("lagerplatz_box_id");
-                            }
-                            if (reader.IsDBNull(1))
-                            {
-                                lagerbox_id = "";
-                            }
-                            else
-                            {
-                                lagerbox_id = reader.GetString("lagerbox_id");
-                            }
-                            list.Add(new Artikel()
-                            {
-                                ArtikelId = reader.GetString("artikel_id"),
-                                LagerPlatz = lagerplatz_id,
-                                LagerPlatzOhneBox = lagerplatz_id_ohne_box,
-                                LagerBox = lagerbox_id
-                            });
+                    while (reader.Read())
+                    {   //LagerPlatz ohne Box
+                        if (reader.IsDBNull(2))
+                        {
+                            lagerplatz_id_ohne_box = "";
                         }
+                        else
+                        {
+                            lagerplatz_id_ohne_box = reader.GetString("lagerplatz_id");
+                        }
+                        //LagerPlatz mit Box
+                        if (reader.IsDBNull(4))
+                        {
+                            lagerplatz_id = "";
+                        }
+                        else
+                        {
+                            lagerplatz_id = reader.GetString("lagerplatz_box_id");
+                        }
+                        if (reader.IsDBNull(1))
+                        {
+                            lagerbox_id = "";
+                        }
+                        else
+                        {
+                            lagerbox_id = reader.GetString("lagerbox_id");
+                        }
+                        list.Add(new Artikel()
+                        {
+                            ArtikelId = reader.GetString("artikel_id"),
+                            LagerPlatz = lagerplatz_id,
+                            LagerPlatzOhneBox = lagerplatz_id_ohne_box,
+                            LagerBox = lagerbox_id
+                        });
                     }
                 }
-
-                return list;
             }
 
+            return list;
+        }
+
+        private Boolean checkBoxExists(String box, MySqlConnection conn)
+        {
+            Boolean foundInDb = false;
+            MySqlCommand cmd2 = new MySqlCommand("SELECT * from lagerbox where lagerbox_id= @box", conn);
+            cmd2.Parameters.AddWithValue("@box", box);
+            using (MySqlDataReader reader = cmd2.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    foundInDb = true;
+                }
+            }
+            return foundInDb;
+        }
+
+        private Boolean checkLagerPlatzExists(String platz, MySqlConnection conn)
+        {
+            Boolean foundInDb = false;
+            MySqlCommand cmd2 = new MySqlCommand("SELECT * from lagerplatz where lagerplatz_id= @platz", conn);
+            cmd2.Parameters.AddWithValue("@platz", platz);
+            using (MySqlDataReader reader = cmd2.ExecuteReader())
+            {
+                if (reader.Read())
+                {
+                    foundInDb = true;
+                }
+            }
+            return foundInDb;
         }
     }
+}

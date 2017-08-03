@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace LagerApp.DTOs
 {
-    public class LagerPlatzDTO
+    public class LagerPlatzDTO:ADTO
     {
         public string LagerBox { get; set; }
         public string LagerPlatz { get; set; }
