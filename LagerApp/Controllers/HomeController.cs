@@ -14,7 +14,9 @@ namespace LagerApp.Controllers
         public IActionResult Index()
         {
             LagerContext con=HttpContext.RequestServices.GetService(typeof(LagerApp.Model.LagerContext)) as LagerContext;
-            return View(con.GetAllArtikel());
+            ViewData["AnzArtikel"]=con.GetNumberOfArticles();
+            ViewData["AnzBoxen"] = con.GetNumberOfBoxes();
+            return View(con.GetAllArtikelLimit());
         }
 
         [HttpGet]
