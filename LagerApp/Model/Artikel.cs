@@ -13,6 +13,7 @@ namespace LagerApp.Model
         public string LagerPlatzOhneBox { get; set; }
         public string LagerBox { get; set; }
         public string ArtikelBezeichnung { get; set; }
+        public string created_at { get; set; }
         public Boolean foundArticleNr{ get; set; }
     }
 }

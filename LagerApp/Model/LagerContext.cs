@@ -222,6 +222,7 @@ namespace LagerApp.Model
                 String lagerplatz_id_ohne_box;
                 String lagerplatz_id;
                 String lagerbox_id;
+                String created_at;
 
                 using (MySqlDataReader reader = cmd.ExecuteReader())
                 {
@@ -244,6 +245,15 @@ namespace LagerApp.Model
                         {
                             lagerplatz_id = reader.GetString("lagerplatz_box_id");
                         }
+                        //LagerPlatz mit Box
+                        if (reader.IsDBNull(3))
+                        {
+                            created_at = "";
+                        }
+                        else
+                        {
+                            created_at = reader.GetString("created_at");
+                        }
                         if (reader.IsDBNull(1))
                         {
                             lagerbox_id = "";
@@ -257,7 +267,9 @@ namespace LagerApp.Model
                             ArtikelId = reader.GetString("artikel_id"),
                             LagerPlatz = lagerplatz_id,
                             LagerPlatzOhneBox = lagerplatz_id_ohne_box,
-                            LagerBox = lagerbox_id
+                            LagerBox = lagerbox_id,
+                            created_at = created_at
+                            
                         });
                     }
                 }

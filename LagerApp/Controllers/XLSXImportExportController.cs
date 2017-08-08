@@ -57,6 +57,8 @@ namespace LagerApp.Controllers
             //Über alle Einträge in Liste iterieren
             foreach (var item in scanList)
             {
+                item.druck_pseudonym = item.druck_pseudonym.Trim().ToUpper();
+                item.lager_fach = item.lager_fach.Trim().ToUpper();
                 switch (checker.CheckLine(item))
                 {
                     case ScanVarianten.ArtikelZuBox:
