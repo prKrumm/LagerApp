@@ -171,7 +171,7 @@ namespace LagerApp.Model
                             lagerplatz_id_ohne_box = reader.GetString("lagerplatz_id");
                         }
                         //LagerPlatz mit Box
-                        if (reader.IsDBNull(4))
+                        if (reader.IsDBNull(5))
                         {
                             lagerplatz_id = "";
                         }
