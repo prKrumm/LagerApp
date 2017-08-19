@@ -263,3 +263,10 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+LagerApp/web.config
+LagerAppUnitTests/UnitTest1.cs
+LagerAppUnitTests/LagerAppUnitTests.csproj
+LagerApp/wwwroot/uploads/report.html
+LagerApp/wwwroot/uploads/GLS/GLS_04082017.csv
+LagerApp/wwwroot/uploads/GLS/GLS_03082017.csv
+LagerApp/wwwroot/uploads/GLS/GLS_02082017.csv
