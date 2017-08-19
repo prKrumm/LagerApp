@@ -171,7 +171,7 @@ namespace LagerApp.Model
                             lagerplatz_id_ohne_box = reader.GetString("lagerplatz_id");
                         }
                         //LagerPlatz mit Box
-                        if (reader.IsDBNull(4))
+                        if (reader.IsDBNull(5))
                         {
                             lagerplatz_id = "";
                         }
@@ -206,6 +206,115 @@ namespace LagerApp.Model
             }
         }
 
+        public List<Artikel> GetAllArtikelLimit()
+        {
+            List<Artikel> list = new List<Artikel>();
+
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                //MySqlCommand cmd = new MySqlCommand("SELECT * FROM artikel a,lagerbox b,lagerplatz p " +
+                //    "where a.lagerbox_id = b.lagerbox_id AND b.lagerplatz_id = p.lagerplatz_id ORDER BY created_at DESC", conn);
+
+                MySqlCommand cmd = new MySqlCommand("SELECT * FROM (artikel a LEFT JOIN lagerbox b " +
+                    "ON a.lagerbox_id = b.lagerbox_id) LEFT OUTER JOIN lagerplatz p ON b.lagerplatz_box_id = p.lagerplatz_id ORDER BY created_at DESC LIMIT 30", conn);
+
+                String lagerplatz_id_ohne_box;
+                String lagerplatz_id;
+                String lagerbox_id;
+                String created_at;
+
+                using (MySqlDataReader reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {   //LagerPlatz ohne Box
+                        if (reader.IsDBNull(2))
+                        {
+                            lagerplatz_id_ohne_box = "";
+                        }
+                        else
+                        {
+                            lagerplatz_id_ohne_box = reader.GetString("lagerplatz_id");
+                        }
+                        //LagerPlatz mit Box
+                        if (reader.IsDBNull(5))
+                        {
+                            lagerplatz_id = "";
+                        }
+                        else
+                        {
+                            lagerplatz_id = reader.GetString("lagerplatz_box_id");
+                        }
+                        //LagerPlatz mit Box
+                        if (reader.IsDBNull(3))
+                        {
+                            created_at = "";
+                        }
+                        else
+                        {
+                            created_at = reader.GetString("created_at");
+                        }
+                        if (reader.IsDBNull(1))
+                        {
+                            lagerbox_id = "";
+                        }
+                        else
+                        {
+                            lagerbox_id = reader.GetString("lagerbox_id");
+                        }
+                        list.Add(new Artikel()
+                        {
+                            ArtikelId = reader.GetString("artikel_id"),
+                            LagerPlatz = lagerplatz_id,
+                            LagerPlatzOhneBox = lagerplatz_id_ohne_box,
+                            LagerBox = lagerbox_id,
+                            created_at = created_at
+                            
+                        });
+                    }
+                }
+            }
+
+            return list;
+        }
+
+        public int GetNumberOfArticles()
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                //MySqlCommand cmd = new MySqlCommand("SELECT * FROM artikel a,lagerbox b,lagerplatz p " +
+                //    "where a.lagerbox_id = b.lagerbox_id AND b.lagerplatz_id = p.lagerplatz_id ORDER BY created_at DESC", conn);
+
+                MySqlCommand cmd = new MySqlCommand("SELECT count(*) FROM artikel a", conn);
+
+
+                var anzArtikel = (int)(long)cmd.ExecuteScalar();
+
+
+                return anzArtikel;
+            }
+            
+        }
+        public int GetNumberOfBoxes()
+        {
+            using (MySqlConnection conn = GetConnection())
+            {
+                conn.Open();
+                //MySqlCommand cmd = new MySqlCommand("SELECT * FROM artikel a,lagerbox b,lagerplatz p " +
+                //    "where a.lagerbox_id = b.lagerbox_id AND b.lagerplatz_id = p.lagerplatz_id ORDER BY created_at DESC", conn);
+
+               
+                MySqlCommand cmd2 = new MySqlCommand("SELECT count(*) FROM lagerbox b", conn);
+
+               
+                var anzBoxen = (int)(long)cmd2.ExecuteScalar();
+
+                return anzBoxen;
+            }
+
+        }
+
         public List<Artikel> GetAllArtikel()
         {
             List<Artikel> list = new List<Artikel>();
@@ -214,7 +323,7 @@ namespace LagerApp.Model
             {
                 conn.Open();
                 //MySqlCommand cmd = new MySqlCommand("SELECT * FROM artikel a,lagerbox b,lagerplatz p " +
-                //    "where a.lagerbox_id = b.lagerbox_id AND b.lagerplatz_id = p.lagerplatz_id", conn);
+                //    "where a.lagerbox_id = b.lagerbox_id AND b.lagerplatz_id = p.lagerplatz_id ORDER BY created_at DESC", conn);
 
                 MySqlCommand cmd = new MySqlCommand("SELECT * FROM (artikel a LEFT JOIN lagerbox b " +
                     "ON a.lagerbox_id = b.lagerbox_id) LEFT OUTER JOIN lagerplatz p ON b.lagerplatz_box_id = p.lagerplatz_id", conn);
@@ -236,7 +345,7 @@ namespace LagerApp.Model
                             lagerplatz_id_ohne_box = reader.GetString("lagerplatz_id");
                         }
                         //LagerPlatz mit Box
-                        if (reader.IsDBNull(4))
+                        if (reader.IsDBNull(5))
                         {
                             lagerplatz_id = "";
                         }
