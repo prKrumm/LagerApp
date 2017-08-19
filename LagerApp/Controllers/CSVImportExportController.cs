@@ -72,7 +72,7 @@ namespace LagerApp.Controllers
                         {
                             ViewData["SuccessMessage"] = "Erfolgreich " + (glsoutput.Context.Row - 1) + " Bestellungen verarbeitet";
                             glsoutput.Dispose();
-                            List<Artikel> SortedList = list.OrderByDescending(o => o.foundArticleNr).ThenBy(o => o.LagerPlatz).ToList();
+                            List<Artikel> SortedList = list.OrderByDescending(o => o.foundArticleNr).ThenBy(o => o.LagerPlatz).ThenBy(o => o.LagerBox).ToList();
                             return View(SortedList);
                         }
                         else
@@ -163,10 +163,10 @@ namespace LagerApp.Controllers
             MatchCollection matches = regex.Matches(ArtikelBezeichnung);
             if (matches.Count > 0) { 
             String ArtikelNr = "";
-                var zähler = 0;
+                var zaehler = 0;
             foreach (var item in matches)
             {
-                    if (zähler == 0)
+                    if (zaehler == 0)
                     {
                         ArtikelNr = item.ToString();
                     }
@@ -174,7 +174,7 @@ namespace LagerApp.Controllers
                     {
                         ArtikelNr = ArtikelNr+","+item.ToString();       
                     }
-                    zähler++;
+                    zaehler++;
             }
                 return ArtikelNr;
             }
