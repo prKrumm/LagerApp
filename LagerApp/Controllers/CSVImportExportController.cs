@@ -67,7 +67,7 @@ namespace LagerApp.Controllers
                         glsoutput.Configuration.RegisterClassMap<GLSMapperWrite>();
                         glsoutput.Configuration.HasHeaderRecord = false;
 
-                        glsoutput.WriteRecords(glsList);
+                        //glsoutput.WriteRecords(glsList);
                         if (csv.Context.Row == glsoutput.Context.Row)
                         {
                             ViewData["SuccessMessage"] = "Erfolgreich " + (glsoutput.Context.Row - 1) + " Bestellungen verarbeitet";
